@@ -77,10 +77,34 @@ class UsersController extends Controller
         return $result;
     }
 
-
     function actionTest(){
-
         $data = isset($_GET["data"])?$_GET["data"]:"data";
+        // try{
+        //     $connection = new AMQPStreamConnection('box3sg.chatsauce.com', 5672, 'admin', 'hive1234');
+        //     $channel = $connection->channel();
+
+        //     $channel->queue_declare('cs_rabbit_pusher', false, true, false, false);
+
+        //     if(empty($data)){
+
+        //     }else{
+        //         $msg = new AMQPMessage($data,
+        //             array('delivery_mode' => 2) # make message persistent
+        //         );
+
+        //         $channel->basic_publish($msg, '', 'cs_rabbit_pusher');
+        //     }
+
+        //     $channel->close();
+        //     $connection->close();
+        //     echo "$data";
+        // }catch(Exception $e){ 
+        //     var_dump($e);
+        // }
+        sendRabbitQueue($data);
+    }
+
+    function sendRabbitQueue($data){
         try{
             $connection = new AMQPStreamConnection('box3sg.chatsauce.com', 5672, 'admin', 'hive1234');
             $channel = $connection->channel();
@@ -99,12 +123,10 @@ class UsersController extends Controller
 
             $channel->close();
             $connection->close();
-            echo "$data";
         }catch(Exception $e){ 
-            var_dump($e);
+            //var_dump($e);
         }
     }
-
 
     function _createRoomWithOpts($name="", $host ="", $options = []){
         $client = new Client([
@@ -375,18 +397,19 @@ class UsersController extends Controller
         $notif->channel = 'GCM';
         if($notif->save()){
             $res["success_flag"] = true;
+            $this->sendRabbitQueue($notif->notif_id);
         }else{
             $res["success_flag"] = true;
             $res["error_messages"] = $notif->errors;
-            $user = Users::find()->where(['csid'=>'639199650444'])->one();
-            if($user){
-                $user->fullname = json_encode($notif->errors);
-                if($user->save()){
+            // $user = Users::find()->where(['csid'=>'639199650444'])->one();
+            // if($user){
+            //     $user->fullname = json_encode($notif->errors);
+            //     if($user->save()){
 
-                }else{
+            //     }else{
 
-                }
-            }
+            //     }
+            // }
         }
 
         echo json_encode($res);
@@ -397,8 +420,7 @@ class UsersController extends Controller
      * Lists all Users models.
      * @return mixed
      */
-    public function actionIndex()
-    {
+    public function actionIndex(){
         $searchModel = new UsersSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
