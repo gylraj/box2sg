@@ -101,7 +101,7 @@ class UsersController extends Controller
         // }catch(Exception $e){ 
         //     var_dump($e);
         // }
-        sendRabbitQueue($data);
+        $this->sendRabbitQueue($data);
     }
 
     function sendRabbitQueue($data){
