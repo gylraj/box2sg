@@ -11,6 +11,8 @@ use yii\filters\VerbFilter;
 use Ejabberd\Rest\Client;
 use backend\models\Devices;
 use backend\models\Notifications;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
 
 /**
  * UsersController implements the CRUD actions for Users model.
@@ -75,6 +77,33 @@ class UsersController extends Controller
         return $result;
     }
 
+
+    function actionTest(){
+
+        $data = isset($_GET["data"])?$_GET["data"]:"data";
+        try{
+            $connection = new AMQPStreamConnection('box3sg.chatsauce.com', 5672, 'admin', 'hive1234');
+            $channel = $connection->channel();
+
+            $channel->queue_declare('cs_rabbit_pusher', false, true, false, false);
+
+            if(empty($data)){
+
+            }else{
+                $msg = new AMQPMessage($data,
+                    array('delivery_mode' => 2) # make message persistent
+                );
+
+                $channel->basic_publish($msg, '', 'cs_rabbit_pusher');
+            }
+
+            $channel->close();
+            $connection->close();
+            echo "$data";
+        }catch(Exception $e){ 
+            var_dump($e);
+        }
+    }
 
 
     function _createRoomWithOpts($name="", $host ="", $options = []){
