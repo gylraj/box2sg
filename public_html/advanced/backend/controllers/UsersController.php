@@ -400,6 +400,7 @@ class UsersController extends Controller
         $message = json_encode($post);
 
         $notif = new Notifications();
+        $notif->notif_token = round(microtime(true) * 1000);
         $notif->message = $message;
         $notif->status = 'pending';
         $notif->channel = 'GCM';

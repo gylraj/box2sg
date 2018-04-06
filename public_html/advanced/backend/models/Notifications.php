@@ -33,7 +33,7 @@ class Notifications extends \yii\db\ActiveRecord
     {
         return [
             [['message'], 'required'],
-            [['message'], 'string'],
+            [['message','notif_token'], 'string'],
             [['start_date', 'end_date', 'created_at', 'updated_at'], 'safe'],
             [['status', 'channel'], 'string', 'max' => 10],
         ];
@@ -46,6 +46,7 @@ class Notifications extends \yii\db\ActiveRecord
     {
         return [
             'notif_id' => 'Notif ID',
+            'notif_token' => 'Notif Token',
             'message' => 'Message',
             'status' => 'Status',
             'start_date' => 'Start Date',
