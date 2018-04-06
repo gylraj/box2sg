@@ -395,6 +395,9 @@ class UsersController extends Controller
         $notif->message = $message;
         $notif->status = 'pending';
         $notif->channel = 'GCM';
+        $notif->start_date = date("Y-m-d H:i:s");
+        $notif->created_at = date("Y-m-d H:i:s");
+        $notif->updated_at = date("Y-m-d H:i:s");
         if($notif->save()){
             $res["success_flag"] = true;
             $this->sendRabbitQueue($notif->notif_id);
