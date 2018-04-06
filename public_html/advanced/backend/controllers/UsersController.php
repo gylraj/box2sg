@@ -39,7 +39,7 @@ class UsersController extends Controller
     }
     function sendPush($token, $msg){
         $registrationIds = [$token];
-        define( 'API_ACCESS_KEY', 'AIzaSyA77AQZJ_R6nH6CuwQBJlx2LLO5LHW8nYY' );
+        define( 'API_ACCESS_KEY', 'AIzaSyAeiQv1KfuP711T0p5PeraUyJ8eMLaqmO0' );
         //$registrationIds = array( $_GET['id'] );
         // prep the bundle
         $msg = array
@@ -79,6 +79,7 @@ class UsersController extends Controller
 
     function actionTest(){
         $data = isset($_GET["data"])?$_GET["data"]:"data";
+        $notif_id = isset($_GET["notif_id"])?$_GET["notif_id"]:"notif_id";
         // try{
         //     $connection = new AMQPStreamConnection('box3sg.chatsauce.com', 5672, 'admin', 'hive1234');
         //     $channel = $connection->channel();
@@ -101,7 +102,11 @@ class UsersController extends Controller
         // }catch(Exception $e){ 
         //     var_dump($e);
         // }
-        $this->sendRabbitQueue($data);
+        // $this->sendRabbitQueue($data);
+        if($notif_id){
+            $sp = $this->sendPush($notif_id, "TEST 1");
+            var_dump($sp);
+        }
     }
 
     function sendRabbitQueue($data){
@@ -160,7 +165,7 @@ class UsersController extends Controller
         $user = null;
         $errors = [];
         if(isset($data)){
-            $this->_createRoomWithOpts("roomname".time(), "box1sg.chatsauce.com",["title"=>'NEW']);
+            $this->_createRoomWithOpts("roomname".time(), Yii::$app->params['xmppServer']['zoneUrl'],["title"=>'NEW']);
         }else{
             $errors[] = "No data received";
         }
@@ -241,9 +246,12 @@ class UsersController extends Controller
                             $is_success = true;
                         }
                         if($is_success){
+                            $completeUrl = Yii::$app->params['xmppServer']['completeUrl'];
+                            $zone = Yii::$app->params['xmppServer']['zone'];
+                            $baseUrl = Yii::$app->params['xmppServer']['baseUrl'];
                             $client = new Client([
-                               'apiUrl' => 'http://box1sg.chatsauce.com:5285/api/',
-                               'host' => 'box1sg.chatsauce.com'
+                               'apiUrl' => $completeUrl.'/api/',
+                               'host' => $zone.'.'.$baseUrl
                             ]);
                             try{
                                 $test = $client->createAccount($phone_number, $password);
