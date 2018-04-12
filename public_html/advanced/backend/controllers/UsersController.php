@@ -309,6 +309,78 @@ class UsersController extends Controller
         echo json_encode($res);
         die();
     }
+    public function actionLeavegroup(){
+        $post = file_get_contents("php://input");
+        $data = json_decode($post, true);
+        $res = [];
+        $res["success_flag"] = true;
+        $res["success_message"] = "";
+        $res["error_message"] = "";
+        if(isset($data)){
+            $access_token = isset($data["access_token"])?$data["access_token"]:"";
+            $host = isset($data["host"])?$data["host"]:"";
+            $roomname = isset($data["roomname"])?$data["roomname"]:"";
+            if($access_token != "" && $host != "" && $roomname != ""){
+                $user = Users::find()->where(["access_token"=>$access_token])->one();
+                if($user){
+                    $csid = $user->csid;
+                    $jbid = $user->jbid
+                    $curl = curl_init();
+                    curl_setopt_array($curl, array(
+                      CURLOPT_PORT => "5280",
+                      CURLOPT_URL => "http://".$host.":5280/api/set_room_affiliation",
+                      CURLOPT_RETURNTRANSFER => true,
+                      CURLOPT_ENCODING => "",
+                      CURLOPT_MAXREDIRS => 10,
+                      CURLOPT_TIMEOUT => 30,
+                      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                      CURLOPT_CUSTOMREQUEST => "POST",
+                      CURLOPT_POSTFIELDS => '{
+                        "name": "'.$roomname.'",
+                        "service":"room.'.$host.'",
+                        "jid": "'.$jbid.'",
+                        "affiliation": "none"
+                        }',
+                      CURLOPT_HTTPHEADER => array(
+                        "cache-control: no-cache",
+                        "content-type: application/json"
+                      ),
+                    ));
+                    $response = curl_exec($curl);
+                    $err = curl_error($curl);
+                    curl_close($curl);
+                    if ($err) {
+                        //echo "cURL Error #:" . $err;
+                        $res["success_flag"] = false;
+                        $res["success_message"] = "";
+                        $res["error_message"] = $err;
+                    } else {
+                        //echo $response;
+                        $res["success_flag"] = true;
+                        $res["success_message"] = "left the group";
+                        $res["error_message"] = "";
+                    }
+                }else{
+                    $res["success_flag"] = false;
+                    $res["success_message"] = "";
+                    $res["error_message"] = "Invalid Access Token";
+                }
+            }else{
+                $res["success_flag"] = false;
+                $res["success_message"] = "";
+                $res["error_message"] = "Missing Param";
+            }
+        }else{
+            $res["success_flag"] = false;
+            $res["success_message"] = "";
+            $res["error_message"] = "Missing Param";
+        }
+
+        echo json_encode($res);
+        die();
+
+    }
+
 
     public function actionRegisterdevice(){
         $post = file_get_contents("php://input");
@@ -430,7 +502,7 @@ class UsersController extends Controller
                 }
             }
         }
-        
+
         echo json_encode($res);
         die();
     }
