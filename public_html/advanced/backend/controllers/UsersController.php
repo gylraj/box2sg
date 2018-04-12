@@ -471,10 +471,10 @@ class UsersController extends Controller
                     $res["data"]["deliveredIds"] = [];
                     foreach ($gms as $gm) {
                         if($gm->readId != ""){
-                            $res["data"]["read"][] = $gm->readId."_".$gm->datetime;
+                            $res["data"]["readIds"][] = $gm->readId."_".$gm->datetime;
                         }
                         if($gm->deliveredId != ""){
-                            $res["data"]["delivered"][] = $gm->deliveredId."_".$gm->datetime;
+                            $res["data"]["deliveredIds"][] = $gm->deliveredId."_".$gm->datetime;
                         }
                     }
                     $res["success_flag"] = true;
