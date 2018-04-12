@@ -449,7 +449,55 @@ class UsersController extends Controller
 
         echo json_encode($res);
         die();
+    }
 
+
+
+    public function actionMessagestatus(){
+        $post = file_get_contents("php://input");
+        $data = json_decode($post, true);
+        $res = [];
+        $res["success_flag"] = true;
+        $res["success_message"] = "";
+        $res["error_message"] = "";
+        if(isset($data)){
+            $access_token = isset($data["access_token"])?$data["access_token"]:"";
+            $msgId = isset($data["msgId"])?$data["msgId"]:"";
+            if($access_token != "" && $msgId != ""){
+                $user = Users::find()->where(["access_token"=>$access_token])->one();
+                if($user){
+                    $gms = GroupMessageStatus::find()->where(["msgId"=>$msgId])->all();
+                    $res["data"]["readIds"] = [];
+                    $res["data"]["deliveredIds"] = [];
+                    foreach ($gms as $gm) {
+                        if($gms->readId != ""){
+                            $res["data"]["read"][] = $gms->readId."_".$gms->datetime;
+                        }
+                        if($gms->deliveredId != ""){
+                            $res["data"]["delivered"][] = $gms->deliveredId."_".$gms->datetime;
+                        }
+                    }
+                    $res["success_flag"] = true;
+                    $res["success_message"] = "Success";
+                    $res["error_message"] = "";
+                }else{
+                    $res["success_flag"] = false;
+                    $res["success_message"] = "";
+                    $res["error_message"] = "Invalid Access Token";
+                }
+            }else{
+                $res["success_flag"] = false;
+                $res["success_message"] = "";
+                $res["error_message"] = "Missing Param";
+            }
+        }else{
+            $res["success_flag"] = false;
+            $res["success_message"] = "";
+            $res["error_message"] = "Missing Param";
+        }
+
+        echo json_encode($res);
+        die();
     }
 
 
