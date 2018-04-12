@@ -20,7 +20,6 @@ class GroupMessageStatus extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id'], 'required'],
             [['msgId','readId','deliveredId'], 'string'],
             [['datetime'], 'safe'],
         ];
