@@ -469,6 +469,7 @@ class UsersController extends Controller
                     $gms = GroupMessageStatus::find()->where(["msgId"=>$msgId])->all();
                     $res["data"]["readIds"] = [];
                     $res["data"]["deliveredIds"] = [];
+                    $res["data"]["msgId"] = $msgId;
                     foreach ($gms as $gm) {
                         if($gm->readId != ""){
                             $res["data"]["readIds"][] = $gm->readId."_".$gm->datetime;
