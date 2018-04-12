@@ -408,11 +408,11 @@ class UsersController extends Controller
                         $gms = new GroupMessageStatus();
                         $gms->msgId = $msgId;
                         if($status == "read"){
-                            $gms->"readId" = $user->jid;
-                            $gms->"deliveredId" = "";
+                            $gms->readId = $user->jid;
+                            $gms->deliveredId = "";
                         }else{
-                            $gms->"readId" = "";
-                            $gms->"deliveredId" = $user->jid;
+                            $gms->readId = "";
+                            $gms->deliveredId = $user->jid;
                         }
                         $gms->datetime = date("Y-m-d H:i:s");
                         if($gms->save()){
