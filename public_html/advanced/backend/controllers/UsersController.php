@@ -324,7 +324,7 @@ class UsersController extends Controller
                 $user = Users::find()->where(["access_token"=>$access_token])->one();
                 if($user){
                     $csid = $user->csid;
-                    $jbid = $user->jbid
+                    $jbid = $user->jbid;
                     $curl = curl_init();
                     curl_setopt_array($curl, array(
                       CURLOPT_PORT => "5280",
