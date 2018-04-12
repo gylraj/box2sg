@@ -423,7 +423,7 @@ class UsersController extends Controller
                 $notif->updated_at = date("Y-m-d H:i:s");
                 if($notif->save()){
                     $res["success_flag"] = true;
-                    $this->sendRabbitQueue($notif->notif_id);
+                    $this->sendRabbitQueue($notif->notif_token);
                 }else{
                     $res["success_flag"] = true;
                     $res["error_messages"] = $notif->errors;
