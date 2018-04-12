@@ -398,9 +398,9 @@ class UsersController extends Controller
                 if($user){
                     $param = ["msgId"=>$msgId];
                     if($status == "read"){
-                        $param["readId"] = $user->jid;
+                        $param["readId"] = $user->jbid;
                     }else{
-                        $param["deliveredId"] = $user->jid;
+                        $param["deliveredId"] = $user->jbid;
                     }
 
                     $gms = GroupMessageStatus::find()->where($param)->one();
@@ -408,11 +408,11 @@ class UsersController extends Controller
                         $gms = new GroupMessageStatus();
                         $gms->msgId = $msgId;
                         if($status == "read"){
-                            $gms->readId = $user->jid;
+                            $gms->readId = $user->jbid;
                             $gms->deliveredId = "";
                         }else{
                             $gms->readId = "";
-                            $gms->deliveredId = $user->jid;
+                            $gms->deliveredId = $user->jbid;
                         }
                         $gms->datetime = date("Y-m-d H:i:s");
                         if($gms->save()){
