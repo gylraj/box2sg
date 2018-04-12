@@ -398,32 +398,39 @@ class UsersController extends Controller
     public function actionPush(){
         $post = Yii::$app->request->post();
         $message = json_encode($post);
-
-        $notif = new Notifications();
-        $notif->notif_token = "not_".round(microtime(true) * 1000);
-        $notif->message = $message;
-        $notif->status = 'pending';
-        $notif->channel = 'GCM';
-        $notif->start_date = date("Y-m-d H:i:s");
-        $notif->created_at = date("Y-m-d H:i:s");
-        $notif->updated_at = date("Y-m-d H:i:s");
-        if($notif->save()){
-            $res["success_flag"] = true;
-            $this->sendRabbitQueue($notif->notif_id);
-        }else{
-            $res["success_flag"] = true;
-            $res["error_messages"] = $notif->errors;
-            // $user = Users::find()->where(['csid'=>'639199650444'])->one();
-            // if($user){
-            //     $user->fullname = json_encode($notif->errors);
-            //     if($user->save()){
-
-            //     }else{
-
-            //     }
-            // }
+        $json = json_decode($message, true);
+        $type = "chat";
+        $ids = [];
+        if($json["type"] == "chat"){
+            $type = "chat";
+            $ids[] = $json["to"];
+        }else if($json["type"] == "groupchat"){
+            $type = "groupchat";
+            $ids = explode("|",$json["offline"]); 
         }
-
+        foreach($ids as $id ){
+            if($id != ""){
+                $idx = explode("/", $id)[0];
+                $notif = new Notifications();
+                $notif->notif_token = "not_".round(microtime(true) * 1000);
+                $notif->message = $message;
+                $notif->status = 'pending';
+                $notif->channel = '';
+                $notif->type = $type;
+                $notif->to = $idx;
+                $notif->start_date = date("Y-m-d H:i:s");
+                $notif->created_at = date("Y-m-d H:i:s");
+                $notif->updated_at = date("Y-m-d H:i:s");
+                if($notif->save()){
+                    $res["success_flag"] = true;
+                    $this->sendRabbitQueue($notif->notif_id);
+                }else{
+                    $res["success_flag"] = true;
+                    $res["error_messages"] = $notif->errors;
+                }
+            }
+        }
+        
         echo json_encode($res);
         die();
     }
