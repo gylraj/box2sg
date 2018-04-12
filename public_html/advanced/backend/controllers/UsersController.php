@@ -469,17 +469,14 @@ class UsersController extends Controller
                     $gms = GroupMessageStatus::find()->where(["msgId"=>$msgId])->all();
                     $res["data"]["readIds"] = [];
                     $res["data"]["deliveredIds"] = [];
-                    echo "<pre>";
-                    var_dump($gms);
-
-                    // foreach ($gms as $gm) {
-                    //     if($gms->readId != ""){
-                    //         $res["data"]["read"][] = $gms->readId."_".$gms->datetime;
-                    //     }
-                    //     if($gms->deliveredId != ""){
-                    //         $res["data"]["delivered"][] = $gms->deliveredId."_".$gms->datetime;
-                    //     }
-                    // }
+                    foreach ($gms as $gm) {
+                        if($gm->readId != ""){
+                            $res["data"]["read"][] = $gm->readId."_".$gm->datetime;
+                        }
+                        if($gm->deliveredId != ""){
+                            $res["data"]["delivered"][] = $gm->deliveredId."_".$gm->datetime;
+                        }
+                    }
                     $res["success_flag"] = true;
                     $res["success_message"] = "Success";
                     $res["error_message"] = "";
