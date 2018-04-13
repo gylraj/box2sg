@@ -599,6 +599,9 @@ class UsersController extends Controller
         }else if($json["type"] == "groupchat"){
             $type = "groupchat";
             $ids = explode("|",$json["offline"]); 
+        }else if($json["type"] == "normal"){
+            $type = "normal";
+            $ids[] = $json["to"];
         }
         foreach($ids as $id ){
             if($id != ""){
