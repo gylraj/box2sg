@@ -382,6 +382,74 @@ class UsersController extends Controller
         die();
     }
 
+    public function actionSetmessagestatusxmpp(){
+        $data = $_POST;
+        $res = [];
+        $res["success_flag"] = true;
+        $res["success_message"] = "";
+        $res["error_message"] = "";
+        if(isset($data)){
+            $jbid = isset($data["jbid"])?$data["jbid"]:"";
+            $msgId = isset($data["msgId"])?$data["msgId"]:"";
+            $status = isset($data["status"])?$data["status"]:"";
+            if($jbid != "" && $msgId != "" && $status != ""){
+                $user = Users::find()->where(["jbid"=>$jbid])->one();
+                if($user){
+                    $param = ["msgId"=>$msgId];
+                    if($status == "read"){
+                        $param["readId"] = $user->jbid;
+                    }else{
+                        $param["deliveredId"] = $user->jbid;
+                    }
+
+                    $gms = GroupMessageStatus::find()->where($param)->one();
+                    if(!$gms){
+                        $gms = new GroupMessageStatus();
+                        $gms->msgId = $msgId;
+                        if($status == "read"){
+                            $gms->readId = $user->jbid;
+                            $gms->deliveredId = "";
+                        }else{
+                            $gms->readId = "";
+                            $gms->deliveredId = $user->jbid;
+                        }
+                        $gms->datetime = date("Y-m-d H:i:s");
+                        if($gms->save()){
+                            $res["success_flag"] = true;
+                            $res["success_message"] = "Success set status";
+                            $res["error_message"] = "";
+                        }else{
+                            $res["success_flag"] = false;
+                            $res["success_message"] = "";
+                            $res["error_message"] = "Failed to set status";
+                            $res["errors"] = $gms->errors;
+                        }
+                    }else{
+                        $res["success_flag"] = true;
+                        $res["success_message"] = "Already Done";
+                        $res["error_message"] = "";
+                    }
+
+                }else{
+                    $res["success_flag"] = false;
+                    $res["success_message"] = "";
+                    $res["error_message"] = "Invalid Access Token";
+                }
+            }else{
+                $res["success_flag"] = false;
+                $res["success_message"] = "";
+                $res["error_message"] = "Missing Param";
+            }
+        }else{
+            $res["success_flag"] = false;
+            $res["success_message"] = "";
+            $res["error_message"] = "Missing Param";
+        }
+
+        echo json_encode($res);
+        die();
+    }
+
     public function actionSetmessagestatus(){
         $post = file_get_contents("php://input");
         $data = json_decode($post, true);
