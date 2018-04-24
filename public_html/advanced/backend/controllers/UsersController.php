@@ -382,6 +382,77 @@ class UsersController extends Controller
         die();
     }
 
+
+
+    public function actionRemovesubscription(){
+        $post = file_get_contents("php://input");
+        $data = json_decode($post, true);
+        $res = [];
+        $res["success_flag"] = true;
+        $res["success_message"] = "";
+        $res["error_message"] = "";
+        if(isset($data)){
+            $access_token = isset($data["access_token"])?$data["access_token"]:"";
+              // "user": "639199650445@sgzone3.chatsauce.com",
+              // "room": "5ad74ba2bd04fb2e96837536@room.sgzone3.chatsauce.com"
+            $user = isset($data["user"])?$data["user"]:"";
+            $room = isset($data["room"])?$data["room"]:"";
+            if($access_token != "" && $user != "" && $room != ""){
+                $cur_user = Users::find()->where(["access_token"=>$access_token])->one();
+                if($cur_user){
+                    $curl = curl_init();
+                    curl_setopt_array($curl, array(
+                      CURLOPT_PORT => "5280",
+                      CURLOPT_URL => "http://".$host.":5280/api/unsubscribe_room",
+                      CURLOPT_RETURNTRANSFER => true,
+                      CURLOPT_ENCODING => "",
+                      CURLOPT_MAXREDIRS => 10,
+                      CURLOPT_TIMEOUT => 30,
+                      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                      CURLOPT_CUSTOMREQUEST => "POST",
+                      CURLOPT_POSTFIELDS => '{
+                        "user": "'.$user.'",
+                        "room":"'.$room.'"
+                        }',
+                      CURLOPT_HTTPHEADER => array(
+                        "cache-control: no-cache",
+                        "content-type: application/json"
+                      ),
+                    ));
+                    $response = curl_exec($curl);
+                    $err = curl_error($curl);
+                    curl_close($curl);
+                    if ($err) {
+                        //echo "cURL Error #:" . $err;
+                        $res["success_flag"] = false;
+                        $res["success_message"] = "";
+                        $res["error_message"] = $err;
+                    } else {
+                        //echo $response;
+                        $res["success_flag"] = true;
+                        $res["success_message"] = "unsubscribed";
+                        $res["error_message"] = "";
+                    }
+                }else{
+                    $res["success_flag"] = false;
+                    $res["success_message"] = "";
+                    $res["error_message"] = "Invalid Access Token";
+                }
+            }else{
+                $res["success_flag"] = false;
+                $res["success_message"] = "";
+                $res["error_message"] = "Missing Param";
+            }
+        }else{
+            $res["success_flag"] = false;
+            $res["success_message"] = "";
+            $res["error_message"] = "Missing Param";
+        }
+
+        echo json_encode($res);
+        die();
+    }
+
     public function actionSetmessagestatusxmpp(){
         $data = $_POST;
         $res = [];
