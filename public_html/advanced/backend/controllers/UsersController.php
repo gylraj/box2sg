@@ -397,7 +397,8 @@ class UsersController extends Controller
               // "room": "5ad74ba2bd04fb2e96837536@room.sgzone3.chatsauce.com"
             $user = isset($data["user"])?$data["user"]:"";
             $room = isset($data["room"])?$data["room"]:"";
-            if($access_token != "" && $user != "" && $room != ""){
+            $host = isset($data["host"])?$data["host"]:"";
+            if($access_token != "" && $user != "" && $room != "" && $host != ""){
                 $cur_user = Users::find()->where(["access_token"=>$access_token])->one();
                 if($cur_user){
                     $curl = curl_init();
