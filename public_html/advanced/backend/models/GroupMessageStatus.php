@@ -20,7 +20,7 @@ class GroupMessageStatus extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['msgId','readId','deliveredId'], 'string'],
+            [['msgId','readId','deliveredId', 'timestamp'], 'string'],
             [['datetime'], 'safe'],
         ];
     }
@@ -35,7 +35,8 @@ class GroupMessageStatus extends \yii\db\ActiveRecord
             'msgId' => 'Message ID',
             'readId' => 'Read ID',
             'deliveredId' => 'Delivered ID',
-            'datetime' => 'datetime'
+            'datetime' => 'datetime',
+	    'timestamp' => 'Timestamp'
         ];
     }
 }

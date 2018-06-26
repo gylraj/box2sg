@@ -681,10 +681,10 @@ class UsersController extends Controller
                     $res["data"]["msgId"] = $msgId;
                     foreach ($gms as $gm) {
                         if($gm->readId != ""){
-                            $res["data"]["readIds"][] = $gm->readId."_".$gm->datetime;
+                            $res["data"]["readIds"][] = $gm->readId."_".$gm->timestamp;
                         }
                         if($gm->deliveredId != ""){
-                            $res["data"]["deliveredIds"][] = $gm->deliveredId."_".$gm->datetime;
+                            $res["data"]["deliveredIds"][] = $gm->deliveredId."_".$gm->timestamp;
                         }
                     }
                     $res["success_flag"] = true;
